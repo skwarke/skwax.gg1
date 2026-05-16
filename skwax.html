@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKWAX COMMUNITY</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --bg2: #0f1114;
+    --bg3: #14171c;
+    --border: #1e2228;
+    --border-bright: #2a3040;
+    --accent: #e8a020;
+    --accent2: #f0c050;
+    --text: #c8cdd6;
+    --text-dim: #5a6070;
+    --text-bright: #edf0f5;
+    --red: #cc3333;
+    --green: #33aa55;
+    --mono: 'Share Tech Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── NOISE ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 9998;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: #060708;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-left { display: flex; gap: 20px; align-items: center; }
+  .topbar-live {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--red);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .topbar-live::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .topbar-right { display: flex; gap: 16px; }
+
+  /* ── NAVBAR ── */
+  nav {
+    background: var(--bg2);
+    border-bottom: 2px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    height: 52px;
+    gap: 0;
+    position: sticky;
+    top: 36px;
+    z-index: 99;
+  }
+
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    margin-right: 32px;
+    text-decoration: none;
+    position: relative;
+  }
+  .logo span { color: var(--accent); }
+  .logo::after {
+    content: 'COMMUNITY';
+    position: absolute;
+    bottom: -7px;
+    left: 0;
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .nav-links { display: flex; gap: 0; flex: 1; }
+
+  .nav-link {
+    padding: 0 16px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .nav-link:hover, .nav-link.active {
+    color: var(--text-bright);
+    border-bottom-color: var(--accent);
+  }
+
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-join {
+    background: var(--accent);
+    color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .btn-join:hover { background: var(--accent2); }
+
+  /* ── LAYOUT ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 60px 0 50px;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.3;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(232,160,32,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-tag::before { content: '//'; color: var(--text-dim); }
+
+  .hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(52px, 8vw, 88px);
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+  .hero-title span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    margin-top: 16px;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateX(2px); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 11px 24px;
+    border: 1px solid var(--border-bright);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* STATS STRIP */
+  .stats-strip {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-strip-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+  }
+  .stat-item {
+    padding: 18px 32px 18px 0;
+    margin-right: 32px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text-bright);
+    line-height: 1;
+  }
+  .stat-val span { color: var(--accent); }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN CONTENT AREA ── */
+  .main-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .section-header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+  }
+  .section-header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-header-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+  }
+
+  /* ── NEWS CARD ── */
+  .news-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 16px;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+  .news-card:hover { border-color: var(--border-bright); }
+  .news-card:hover .news-title { color: var(--accent); }
+
+  .news-thumb {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    aspect-ratio: 16/10;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .news-thumb-icon {
+    font-size: 24px;
+    color: var(--text-dim);
+    opacity: 0.3;
+  }
+  .news-thumb-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--bg3), #1a2030);
+  }
+  .news-thumb::after {
+    content: 'CS2';
+    position: absolute;
+    bottom: 4px; right: 4px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--accent);
+    background: rgba(0,0,0,0.7);
+    padding: 1px 4px;
+  }
+
+  .news-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .news-cat {
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .news-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    line-height: 1.3;
+    margin-bottom: 6px;
+    transition: color 0.15s;
+  }
+  .news-excerpt {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ── MATCHES TABLE ── */
+  .match-row {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    margin-bottom: 4px;
+    display: grid;
+    grid-template-columns: 120px 1fr auto 1fr 80px;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .match-row:hover { border-color: var(--border-bright); }
+  .match-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .match-time span { display: block; color: var(--accent); font-size: 10px; }
+  .match-team {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .match-team.our { color: var(--accent); }
+  .match-score {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+  .match-score.win { color: var(--green); }
+  .match-score.loss { color: var(--red); }
+  .match-team-right { text-align: right; }
+  .match-map {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: right;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    text-align: center;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .sidebar-card-header {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+  }
+  .sidebar-card-body { padding: 12px 14px; }
+
+  /* RANK CARD */
+  .rank-display {
+    text-align: center;
+    padding: 16px 0;
+  }
+  .rank-number {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(232,160,32,0.4);
+  }
+  .rank-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* PLAYER ROW */
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .player-row:last-child { border-bottom: none; }
+  .player-avatar {
+    width: 32px; height: 32px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .player-info { flex: 1; }
+  .player-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .player-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .player-rating {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  /* ── ROSTER PAGE ── */
+  .roster-hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 0 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .roster-hero::before {
+    content: 'ROSTER';
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 160px;
+    font-weight: 900;
+    color: var(--border);
+    pointer-events: none;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .player-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .player-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+  .player-card-top {
+    background: var(--bg3);
+    height: 120px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .player-card-top::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(232,160,32,0.05) 0%, transparent 60%);
+  }
+  .player-card-avatar-big {
+    width: 70px; height: 70px;
+    background: var(--bg);
+    border: 2px solid var(--border-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+    position: relative;
+  }
+  .player-card-flag {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-size: 20px;
+  }
+  .player-card-body { padding: 14px; }
+  .player-card-nick {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .player-card-name {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .player-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+  .pcs { }
+  .pcs-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+  .pcs-key {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .role-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid var(--border-bright);
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .role-badge.igl { border-color: var(--accent); color: var(--accent); }
+
+  /* ── STATS PAGE ── */
+  .stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+  }
+  .stats-table th {
+    background: var(--bg3);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .stats-table th.num { text-align: right; }
+  .stats-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .stats-table td.num {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .stats-table tr:last-child td { border-bottom: none; }
+  .stats-table tr:hover td { background: var(--bg3); }
+  .stats-table .nick {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .rating-high { color: var(--green); font-weight: 700; }
+  .rating-mid { color: var(--accent); font-weight: 700; }
+  .rating-low { color: var(--red); }
+
+  /* ACHIEVEMENTS */
+  .achievement-list { display: grid; gap: 8px; margin-top: 16px; }
+  .achievement-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.15s;
+  }
+  .achievement-item:hover { border-color: var(--border-bright); }
+  .ach-place {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text-dim);
+    line-height: 1;
+    text-align: center;
+  }
+  .ach-place.gold { color: #FFD700; }
+  .ach-place.silver { color: #C0C0C0; }
+  .ach-place.bronze { color: #CD7F32; }
+  .ach-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .ach-event {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .ach-prize {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    text-align: right;
+  }
+  .ach-prize span { display: block; font-size: 10px; color: var(--text-dim); }
+
+  /* PERF BAR */
+  .perf-section { margin-top: 24px; }
+  .perf-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .perf-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 80px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .perf-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    position: relative;
+  }
+  .perf-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    position: relative;
+    transition: width 1s ease;
+  }
+  .perf-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-bright);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    background: var(--bg3);
+    border-top: 2px solid var(--accent);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    height: 32px;
+    display: flex;
+    align-items: center;
+  }
+  .ticker-label {
+    background: var(--accent);
+    color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0 14px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .ticker-content {
+    display: flex;
+    animation: ticker 30s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker-item {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0 28px;
+    border-right: 1px solid var(--border);
+  }
+  .ticker-item strong { color: var(--text-bright); }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 32px 24px 20px;
+    margin-top: 40px;
+  }
+  .footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .footer-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .footer-col-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .footer-link {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 3px 0;
+    transition: color 0.15s;
+    cursor: pointer;
+  }
+  .footer-link:hover { color: var(--accent); }
+  .footer-bottom {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page.active { animation: fadeIn 0.2s ease; }
+
+  /* ── MAP WIN RATE ── */
+  .map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .map-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+  }
+  .map-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .map-wr-bar {
+    height: 4px;
+    background: var(--border);
+    margin-bottom: 4px;
+  }
+  .map-wr-fill { height: 100%; }
+  .map-wr-val {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── HAMBURGER ── */
+  .burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: auto;
+    background: none;
+    border: none;
+  }
+  .burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-dim);
+    transition: all 0.2s;
+  }
+  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); background: var(--accent); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); background: var(--accent); }
+
+  /* ── MOBILE DRAWER ── */
+  .mobile-drawer {
+    display: none;
+    position: fixed;
+    top: 88px; /* topbar + nav */
+    left: 0; right: 0; bottom: 0;
+    background: var(--bg);
+    z-index: 98;
+    flex-direction: column;
+    border-top: 2px solid var(--accent);
+    overflow-y: auto;
+  }
+  .mobile-drawer.open { display: flex; }
+  .mobile-drawer-link {
+    padding: 18px 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mobile-drawer-link:hover, .mobile-drawer-link.active {
+    color: var(--text-bright);
+    background: var(--bg2);
+  }
+  .mobile-drawer-link::after { content: '→'; color: var(--accent); font-size: 18px; }
+  .mobile-drawer-join {
+    margin: 20px 24px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px 24px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  /* ── BOTTOM NAV (mobile) ── */
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    z-index: 97;
+    height: 56px;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-top: 2px solid transparent;
+    padding-top: 2px;
+  }
+  .bottom-nav-item.active { border-top-color: var(--accent); }
+  .bottom-nav-item.active .bn-icon { color: var(--accent); }
+  .bottom-nav-item.active .bn-label { color: var(--text-bright); }
+  .bn-icon { font-size: 18px; color: var(--text-dim); line-height: 1; }
+  .bn-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+
+    /* topbar: show only live + date */
+    .topbar { padding: 0 14px; }
+    .topbar-left span:not(:first-child) { display: none; }
+    .topbar-right span:last-child { display: none; }
+
+    /* nav */
+    nav { padding: 0 14px; top: 36px; }
+    .logo { margin-right: 0; font-size: 20px; }
+    .nav-links { display: none; }
+    .nav-right { display: none; }
+    .burger { display: flex; }
+
+    /* bottom nav */
+    .bottom-nav { display: grid; }
+
+    /* add padding so content isn't behind bottom nav */
+    .page { padding-bottom: 64px; }
+    footer { padding-bottom: 72px; }
+
+    /* hero */
+    .hero { padding: 32px 0 28px; }
+    .hero-content { grid-template-columns: 1fr; padding: 0 14px; }
+    .hero-title { font-size: 52px; }
+    .hero-sub { font-size: 13px; }
+    .hero-actions { flex-wrap: wrap; }
+
+    /* stats strip */
+    .stats-strip-inner {
+      padding: 0 14px;
+      overflow-x: auto;
+      gap: 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .stats-strip-inner::-webkit-scrollbar { display: none; }
+    .stat-item { padding: 14px 20px 14px 0; margin-right: 20px; flex-shrink: 0; }
+    .stat-val { font-size: 22px; }
+
+    /* main grid: single column */
+    .main-grid {
+      grid-template-columns: 1fr;
+      padding: 14px;
+      gap: 14px;
+    }
+
+    /* sidebar becomes inline section */
+    .sidebar-card { margin-bottom: 12px; }
+
+    /* news card */
+    .news-card { grid-template-columns: 80px 1fr; gap: 12px; padding: 12px; }
+    .news-title { font-size: 14px; }
+    .news-excerpt { display: none; }
+
+    /* match row */
+    .match-row {
+      grid-template-columns: 70px 1fr auto 1fr 56px;
+      padding: 10px 12px;
+      gap: 6px;
+    }
+    .match-time { font-size: 9px; }
+    .match-team { font-size: 13px; }
+    .match-score { font-size: 16px; }
+    .match-map { font-size: 9px; padding: 2px 4px; }
+
+    /* roster grid */
+    .roster-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .player-card-top { height: 90px; }
+    .player-card-avatar-big { width: 56px; height: 56px; font-size: 22px; }
+    .player-card-nick { font-size: 16px; }
+    .player-card-body { padding: 10px; }
+
+    /* roster hero */
+    .roster-hero { padding: 24px 0 20px; }
+    .roster-hero::before { font-size: 80px; }
+
+    /* stats table: hide less important cols on mobile */
+    .stats-table th.hide-mobile,
+    .stats-table td.hide-mobile { display: none; }
+    .stats-table th, .stats-table td { padding: 8px 10px; }
+    .stats-table .nick { font-size: 13px; }
+
+    /* perf + maps grid */
+    div[style*="grid-template-columns: 1fr 1fr"] {
+      display: block !important;
+    }
+    .perf-section { margin-bottom: 20px; }
+
+    /* achievement */
+    .achievement-item { grid-template-columns: 40px 1fr; gap: 10px; padding: 12px; }
+    .ach-prize { display: none; }
+    .ach-place { font-size: 22px; }
+    .ach-name { font-size: 14px; }
+
+    /* footer */
+    .footer-inner { grid-template-columns: 1fr; gap: 20px; }
+
+    /* container */
+    .container { padding: 0 14px; }
+
+    /* rank display */
+    .rank-number { font-size: 56px; }
+
+    /* section headers */
+    .section-header-tag { display: none; }
+  }
+
+  @media (max-width: 400px) {
+    .hero-title { font-size: 42px; }
+    .roster-grid { grid-template-columns: 1fr; }
+    .match-row { grid-template-columns: 60px 1fr auto 1fr; }
+    .match-map { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-live">LIVE</div>
+    <span>SKWAX vs NEXUS — 12:5 (MIRAGE)</span>
+    <span style="color: var(--border-bright)">|</span>
+    <span>Рейтинг: #47 RU</span>
+  </div>
+  <div class="topbar-right">
+    <span>16 мая 2026</span>
+    <span style="color: var(--border-bright)">|</span>
+    <span>CS2</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#"><span>SKW</span>AX</a>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="showPage('home', this)">Главная</a>
+    <a class="nav-link" onclick="showPage('roster', this)">Состав</a>
+    <a class="nav-link" onclick="showPage('stats', this)">Статистика</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-join" onclick="showPage('roster', document.querySelectorAll('.nav-link')[1])">Вступить в клан</button>
+  </div>
+  <button class="burger" id="burger" onclick="toggleDrawer()" aria-label="Меню">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="mobile-drawer-link" onclick="showPage('home', null); closeDrawer()">Главная</div>
+  <div class="mobile-drawer-link" onclick="showPage('roster', null); closeDrawer()">Состав</div>
+  <div class="mobile-drawer-link" onclick="showPage('stats', null); closeDrawer()">Статистика</div>
+  <button class="mobile-drawer-join" onclick="showPage('roster', null); closeDrawer()">Вступить в клан</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bottom-nav-item active" id="bn-home" onclick="showPage('home', null); setBottomNav('home')">
+    <div class="bn-icon">⌂</div>
+    <div class="bn-label">Главная</div>
+  </div>
+  <div class="bottom-nav-item" id="bn-roster" onclick="showPage('roster', null); setBottomNav('roster')">
+    <div class="bn-icon">◈</div>
+    <div class="bn-label">Состав</div>
+  </div>
+  <div class="bottom-nav-item" id="bn-stats" onclick="showPage('stats', null); setBottomNav('stats')">
+    <div class="bn-icon">▦</div>
+    <div class="bn-label">Статистика</div>
+  </div>
+</div>
+
+<!-- ════════════ HOME PAGE ════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div>
+        <div class="hero-tag">CS2 · RU Community · Est. 2023</div>
+        <div class="hero-title"><span>SKW</span>AX<br>COMMUNITY</div>
+        <p class="hero-sub">Конкурентное CS2-сообщество. Регулярные матчи, турниры, аналитика. Присоединяйся — докажи свою игру.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="showPage('roster', document.querySelectorAll('.nav-link')[1])">Вступить</button>
+          <button class="btn-secondary" onclick="showPage('stats', document.querySelectorAll('.nav-link')[2])">Статистика →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stats-strip-inner">
+      <div class="stat-item">
+        <div class="stat-val">8<span>чел</span></div>
+        <div class="stat-label">Активных игроков</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">64<span>%</span></div>
+        <div class="stat-label">Win Rate (30 дней)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">#<span>47</span></div>
+        <div class="stat-label">Рейтинг RU</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">1.<span>18</span></div>
+        <div class="stat-label">Средний рейтинг</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">3</div>
+        <div class="stat-label">Турнира сыграно</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-label">МАТЧИ</div>
+    <div class="ticker-content">
+      <div class="ticker-item"><strong>SKWAX</strong> 16:9 NEXUS · Mirage</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 14:16 FRST · Inferno</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 16:5 VOLT · Dust2</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 16:12 GRND · Ancient</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 7:16 PRISM · Nuke</div>
+      <!-- duplicate for seamless loop -->
+      <div class="ticker-item"><strong>SKWAX</strong> 16:9 NEXUS · Mirage</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 14:16 FRST · Inferno</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 16:5 VOLT · Dust2</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 16:12 GRND · Ancient</div>
+      <div class="ticker-item"><strong>SKWAX</strong> 7:16 PRISM · Nuke</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+    <div>
+      <!-- NEWS -->
+      <div class="section-header">
+        <span class="section-header-title">Последние новости</span>
+        <div class="section-header-line"></div>
+        <span class="section-header-tag">NEWS</span>
+      </div>
+
+      <div class="news-card">
+        <div class="news-thumb"><div class="news-thumb-bg"></div></div>
+        <div>
+          <div class="news-meta"><span class="news-cat">Турнир</span><span>15 мая 2026</span></div>
+          <div class="news-title">SKWAX выходит в финал RU Community Cup #3</div>
+          <div class="news-excerpt">После уверенной победы над NEXUS 16:9 на Mirage команда обеспечила себе место в финале турнира. Следующий матч — 18 мая.</div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-thumb"><div class="news-thumb-bg"></div></div>
+        <div>
+          <div class="news-meta"><span class="news-cat">Состав</span><span>10 мая 2026</span></div>
+          <div class="news-title">К составу присоединяется новый AWPer — zephyr</div>
+          <div class="news-excerpt">Опытный снайпер с рейтингом 1.24 и опытом турнирной игры. Добро пожаловать в команду.</div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-thumb"><div class="news-thumb-bg"></div></div>
+        <div>
+          <div class="news-meta"><span class="news-cat">Матч</span><span>5 мая 2026</span></div>
+          <div class="news-title">16:5 против VOLT на Dust2 — доминирование в атаке</div>
+          <div class="news-excerpt">Лучший результат сезона. Коэффициент попаданий команды составил 61%, mvp — sklx с рейтингом 1.47.</div>
+        </div>
+      </div>
+
+      <!-- RECENT RESULTS -->
+      <div class="section-header" style="margin-top: 24px;">
+        <span class="section-header-title">Последние результаты</span>
+        <div class="section-header-line"></div>
+        <span class="section-header-tag">RESULTS</span>
+      </div>
+
+      <div class="match-row">
+        <div class="match-time"><span>ЗАВЕРШЁН</span>15 МАЯ</div>
+        <div class="match-team our">SKWAX</div>
+        <div class="match-score win">16 : 9</div>
+        <div class="match-team match-team-right">NEXUS</div>
+        <div class="match-map">MIRAGE</div>
+      </div>
+      <div class="match-row">
+        <div class="match-time"><span>ЗАВЕРШЁН</span>11 МАЯ</div>
+        <div class="match-team our">SKWAX</div>
+        <div class="match-score loss">14 : 16</div>
+        <div class="match-team match-team-right">FRST</div>
+        <div class="match-map">INFERNO</div>
+      </div>
+      <div class="match-row">
+        <div class="match-time"><span>ЗАВЕРШЁН</span>5 МАЯ</div>
+        <div class="match-team our">SKWAX</div>
+        <div class="match-score win">16 : 5</div>
+        <div class="match-team match-team-right">VOLT</div>
+        <div class="match-map">DUST2</div>
+      </div>
+      <div class="match-row">
+        <div class="match-time"><span>ЗАВЕРШЁН</span>1 МАЯ</div>
+        <div class="match-team our">SKWAX</div>
+        <div class="match-score win">16 : 12</div>
+        <div class="match-team match-team-right">GRND</div>
+        <div class="match-map">ANCIENT</div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-header"><span class="sidebar-card-title">Рейтинг RU</span></div>
+        <div class="sidebar-card-body">
+          <div class="rank-display">
+            <div class="rank-number">#47</div>
+            <div class="rank-label">Community Ranking</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header"><span class="sidebar-card-title">Состав</span></div>
+        <div class="sidebar-card-body">
+          <div class="player-row">
+            <div class="player-avatar">SK</div>
+            <div class="player-info">
+              <div class="player-name">sklx</div>
+              <div class="player-role">IGL · Rifler</div>
+            </div>
+            <div class="player-rating">1.31</div>
+          </div>
+          <div class="player-row">
+            <div class="player-avatar">ZP</div>
+            <div class="player-info">
+              <div class="player-name">zephyr</div>
+              <div class="player-role">AWPer</div>
+            </div>
+            <div class="player-rating">1.24</div>
+          </div>
+          <div class="player-row">
+            <div class="player-avatar">VX</div>
+            <div class="player-info">
+              <div class="player-name">vortex</div>
+              <div class="player-role">Entry Fragger</div>
+            </div>
+            <div class="player-rating">1.19</div>
+          </div>
+          <div class="player-row">
+            <div class="player-avatar">CR</div>
+            <div class="player-info">
+              <div class="player-name">crane</div>
+              <div class="player-role">Support</div>
+            </div>
+            <div class="player-rating">1.08</div>
+          </div>
+          <div class="player-row">
+            <div class="player-avatar">NX</div>
+            <div class="player-info">
+              <div class="player-name">nxst</div>
+              <div class="player-role">Lurker</div>
+            </div>
+            <div class="player-rating">1.15</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header"><span class="sidebar-card-title">Предстоящие матчи</span></div>
+        <div class="sidebar-card-body">
+          <div style="padding: 8px 0; border-bottom: 1px solid var(--border);">
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--accent);">18 МАЯ · 20:00</div>
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-bright); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">SKWAX vs PRISM</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">RU Cup Финал · NUKE</div>
+          </div>
+          <div style="padding: 8px 0;">
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">22 МАЯ · TBD</div>
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-bright); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">SKWAX vs OMEN</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">FaceIt · TBD</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ROSTER PAGE ════════════ -->
+<div class="page" id="page-roster">
+  <div class="roster-hero">
+    <div class="container">
+      <div class="hero-tag">// ОСНОВНОЙ СОСТАВ · 2026</div>
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; text-transform: uppercase; color: var(--text-bright); line-height: 1;">Состав <span style="color: var(--accent)">SKWAX</span></div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: 24px; padding-bottom: 40px;">
+    <div class="section-header">
+      <span class="section-header-title">Основной состав</span>
+      <div class="section-header-line"></div>
+      <span class="section-header-tag">5 игроков</span>
+    </div>
+
+    <div class="roster-grid">
+      <div class="player-card">
+        <div class="player-card-top">
+          <div class="player-card-avatar-big">SK</div>
+          <div class="player-card-flag">🇷🇺</div>
+        </div>
+        <div class="player-card-body">
+          <div class="role-badge igl">IGL</div>
+          <div class="player-card-nick">sklx</div>
+          <div class="player-card-name">Алексей «sklx» М.</div>
+          <div class="player-card-stats">
+            <div class="pcs"><div class="pcs-val" style="color: var(--green)">1.31</div><div class="pcs-key">Rating</div></div>
+            <div class="pcs"><div class="pcs-val">64%</div><div class="pcs-key">HS%</div></div>
+            <div class="pcs"><div class="pcs-val">22.4</div><div class="pcs-key">ADR</div></div>
+            <div class="pcs"><div class="pcs-val">0.78</div><div class="pcs-key">K/D</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-card">
+        <div class="player-card-top">
+          <div class="player-card-avatar-big">ZP</div>
+          <div class="player-card-flag">🇷🇺</div>
+        </div>
+        <div class="player-card-body">
+          <div class="role-badge">AWPer</div>
+          <div class="player-card-nick">zephyr</div>
+          <div class="player-card-name">Даниил «zephyr» К.</div>
+          <div class="player-card-stats">
+            <div class="pcs"><div class="pcs-val" style="color: var(--green)">1.24</div><div class="pcs-key">Rating</div></div>
+            <div class="pcs"><div class="pcs-val">58%</div><div class="pcs-key">HS%</div></div>
+            <div class="pcs"><div class="pcs-val">19.1</div><div class="pcs-key">ADR</div></div>
+            <div class="pcs"><div class="pcs-val">0.71</div><div class="pcs-key">K/D</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-card">
+        <div class="player-card-top">
+          <div class="player-card-avatar-big">VX</div>
+          <div class="player-card-flag">🇷🇺</div>
+        </div>
+        <div class="player-card-body">
+          <div class="role-badge">Entry</div>
+          <div class="player-card-nick">vortex</div>
+          <div class="player-card-name">Илья «vortex» Д.</div>
+          <div class="player-card-stats">
+            <div class="pcs"><div class="pcs-val" style="color: var(--accent)">1.19</div><div class="pcs-key">Rating</div></div>
+            <div class="pcs"><div class="pcs-val">71%</div><div class="pcs-key">HS%</div></div>
+            <div class="pcs"><div class="pcs-val">21.8</div><div class="pcs-key">ADR</div></div>
+            <div class="pcs"><div class="pcs-val">0.68</div><div class="pcs-key">K/D</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-card">
+        <div class="player-card-top">
+          <div class="player-card-avatar-big">CR</div>
+          <div class="player-card-flag">🇷🇺</div>
+        </div>
+        <div class="player-card-body">
+          <div class="role-badge">Support</div>
+          <div class="player-card-nick">crane</div>
+          <div class="player-card-name">Михаил «crane» В.</div>
+          <div class="player-card-stats">
+            <div class="pcs"><div class="pcs-val" style="color: var(--accent)">1.08</div><div class="pcs-key">Rating</div></div>
+            <div class="pcs"><div class="pcs-val">53%</div><div class="pcs-key">HS%</div></div>
+            <div class="pcs"><div class="pcs-val">16.4</div><div class="pcs-key">ADR</div></div>
+            <div class="pcs"><div class="pcs-val">0.61</div><div class="pcs-key">K/D</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-card">
+        <div class="player-card-top">
+          <div class="player-card-avatar-big">NX</div>
+          <div class="player-card-flag">🇷🇺</div>
+        </div>
+        <div class="player-card-body">
+          <div class="role-badge">Lurker</div>
+          <div class="player-card-nick">nxst</div>
+          <div class="player-card-name">Арtem «nxst» С.</div>
+          <div class="player-card-stats">
+            <div class="pcs"><div class="pcs-val" style="color: var(--accent)">1.15</div><div class="pcs-key">Rating</div></div>
+            <div class="pcs"><div class="pcs-val">62%</div><div class="pcs-key">HS%</div></div>
+            <div class="pcs"><div class="pcs-val">18.9</div><div class="pcs-key">ADR</div></div>
+            <div class="pcs"><div class="pcs-val">0.66</div><div class="pcs-key">K/D</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECRUITING -->
+    <div style="margin-top: 32px; background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-bright); text-transform: uppercase; letter-spacing: 0.05em;">Набор открыт</div>
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 4px;">Ищем: Rifler · Минимум FaceIt Level 7 · Возраст 16+</div>
+      </div>
+      <button class="btn-primary" style="white-space: nowrap;">Подать заявку</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ STATS PAGE ════════════ -->
+<div class="page" id="page-stats">
+  <div class="roster-hero">
+    <div class="container">
+      <div class="hero-tag">// СЕЗОН 2026 · 30 МАТЧЕЙ</div>
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; text-transform: uppercase; color: var(--text-bright); line-height: 1;">Статистика <span style="color: var(--accent)">&amp; Достижения</span></div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: 24px; padding-bottom: 40px;">
+
+    <!-- PLAYER STATS TABLE -->
+    <div class="section-header">
+      <span class="section-header-title">Статистика игроков — Сезон 2026</span>
+      <div class="section-header-line"></div>
+      <span class="section-header-tag">STATS</span>
+    </div>
+
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Игрок</th>
+          <th class="hide-mobile">Роль</th>
+          <th class="num">Rating</th>
+          <th class="num">K/D</th>
+          <th class="num hide-mobile">ADR</th>
+          <th class="num hide-mobile">HS%</th>
+          <th class="num hide-mobile">Матчи</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-family: var(--mono); color: var(--text-dim);">1</td>
+          <td class="nick">sklx</td>
+          <td class="hide-mobile"><span style="font-family: var(--mono); font-size: 10px; color: var(--accent);">IGL</span></td>
+          <td class="num"><span class="rating-high">1.31</span></td>
+          <td class="num">1.42</td>
+          <td class="num hide-mobile">82.4</td>
+          <td class="num hide-mobile">64%</td>
+          <td class="num hide-mobile">30</td>
+        </tr>
+        <tr>
+          <td style="font-family: var(--mono); color: var(--text-dim);">2</td>
+          <td class="nick">zephyr</td>
+          <td class="hide-mobile"><span style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">AWP</span></td>
+          <td class="num"><span class="rating-high">1.24</span></td>
+          <td class="num">1.33</td>
+          <td class="num hide-mobile">76.1</td>
+          <td class="num hide-mobile">58%</td>
+          <td class="num hide-mobile">18</td>
+        </tr>
+        <tr>
+          <td style="font-family: var(--mono); color: var(--text-dim);">3</td>
+          <td class="nick">vortex</td>
+          <td class="hide-mobile"><span style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">Entry</span></td>
+          <td class="num"><span class="rating-mid">1.19</span></td>
+          <td class="num">1.21</td>
+          <td class="num hide-mobile">79.8</td>
+          <td class="num hide-mobile">71%</td>
+          <td class="num hide-mobile">30</td>
+        </tr>
+        <tr>
+          <td style="font-family: var(--mono); color: var(--text-dim);">4</td>
+          <td class="nick">nxst</td>
+          <td class="hide-mobile"><span style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">Lurker</span></td>
+          <td class="num"><span class="rating-mid">1.15</span></td>
+          <td class="num">1.18</td>
+          <td class="num hide-mobile">71.3</td>
+          <td class="num hide-mobile">62%</td>
+          <td class="num hide-mobile">30</td>
+        </tr>
+        <tr>
+          <td style="font-family: var(--mono); color: var(--text-dim);">5</td>
+          <td class="nick">crane</td>
+          <td class="hide-mobile"><span style="font-family: var(--mono); font-size: 10px; color: var(--text-dim);">Support</span></td>
+          <td class="num"><span class="rating-mid">1.08</span></td>
+          <td class="num">1.04</td>
+          <td class="num hide-mobile">64.4</td>
+          <td class="num hide-mobile">53%</td>
+          <td class="num hide-mobile">30</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PERF + MAPS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px;">
+
+      <div>
+        <div class="section-header">
+          <span class="section-header-title">Командная эффективность</span>
+          <div class="section-header-line"></div>
+        </div>
+        <div class="perf-section">
+          <div class="perf-row">
+            <div class="perf-label">Win Rate</div>
+            <div class="perf-bar-bg"><div class="perf-bar-fill" style="width: 64%; background: var(--green)"></div></div>
+            <div class="perf-val">64%</div>
+          </div>
+          <div class="perf-row">
+            <div class="perf-label">HS Rate</div>
+            <div class="perf-bar-bg"><div class="perf-bar-fill" style="width: 62%"></div></div>
+            <div class="perf-val">62%</div>
+          </div>
+          <div class="perf-row">
+            <div class="perf-label">ADR</div>
+            <div class="perf-bar-bg"><div class="perf-bar-fill" style="width: 74%"></div></div>
+            <div class="perf-val">74.8</div>
+          </div>
+          <div class="perf-row">
+            <div class="perf-label">1st Kill%</div>
+            <div class="perf-bar-bg"><div class="perf-bar-fill" style="width: 55%"></div></div>
+            <div class="perf-val">55%</div>
+          </div>
+          <div class="perf-row">
+            <div class="perf-label">KAST</div>
+            <div class="perf-bar-bg"><div class="perf-bar-fill" style="width: 72%; background: var(--green)"></div></div>
+            <div class="perf-val">72%</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <span class="section-header-title">Win Rate по картам</span>
+          <div class="section-header-line"></div>
+        </div>
+        <div class="map-grid">
+          <div class="map-item">
+            <div class="map-name">Mirage</div>
+            <div class="map-wr-bar"><div class="map-wr-fill" style="width: 78%; background: var(--green)"></div></div>
+            <div class="map-wr-val"><span style="color: var(--green)">78%</span><span>9W-3L</span></div>
+          </div>
+          <div class="map-item">
+            <div class="map-name">Dust2</div>
+            <div class="map-wr-bar"><div class="map-wr-fill" style="width: 70%; background: var(--green)"></div></div>
+            <div class="map-wr-val"><span style="color: var(--green)">70%</span><span>7W-3L</span></div>
+          </div>
+          <div class="map-item">
+            <div class="map-name">Ancient</div>
+            <div class="map-wr-bar"><div class="map-wr-fill" style="width: 60%; background: var(--accent)"></div></div>
+            <div class="map-wr-val"><span style="color: var(--accent)">60%</span><span>3W-2L</span></div>
+          </div>
+          <div class="map-item">
+            <div class="map-name">Inferno</div>
+            <div class="map-wr-bar"><div class="map-wr-fill" style="width: 44%; background: var(--red)"></div></div>
+            <div class="map-wr-val"><span style="color: var(--red)">44%</span><span>4W-5L</span></div>
+          </div>
+          <div class="map-item">
+            <div class="map-name">Nuke</div>
+            <div class="map-wr-bar"><div class="map-wr-fill" style="width: 40%; background: var(--red)"></div></div>
+            <div class="map-wr-val"><span style="color: var(--red)">40%</span><span>2W-3L</span></div>
+          </div>
+          <div class="map-item">
+            <div class="map-name">Anubis</div>
+            <div class="map-wr-bar"><div class="map-wr-fill" style="width: 67%; background: var(--accent)"></div></div>
+            <div class="map-wr-val"><span style="color: var(--accent)">67%</span><span>2W-1L</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="section-header" style="margin-top: 32px;">
+      <span class="section-header-title">Достижения</span>
+      <div class="section-header-line"></div>
+      <span class="section-header-tag">TROPHIES</span>
+    </div>
+
+    <div class="achievement-list">
+      <div class="achievement-item">
+        <div class="ach-place silver">2nd</div>
+        <div>
+          <div class="ach-name">RU Community Cup #2</div>
+          <div class="ach-event">Апрель 2026 · 32 команды</div>
+        </div>
+        <div class="ach-prize">Финалист<span>Апрель 2026</span></div>
+      </div>
+      <div class="achievement-item">
+        <div class="ach-place gold">1st</div>
+        <div>
+          <div class="ach-name">FaceIt Local League — Весна</div>
+          <div class="ach-event">Март 2026 · 16 команд</div>
+        </div>
+        <div class="ach-prize">Победитель<span>Март 2026</span></div>
+      </div>
+      <div class="achievement-item">
+        <div class="ach-place bronze">3rd</div>
+        <div>
+          <div class="ach-name">RU Community Cup #1</div>
+          <div class="ach-event">Январь 2026 · 24 команды</div>
+        </div>
+        <div class="ach-prize">3-е место<span>Январь 2026</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo"><span>SKW</span>AX</div>
+      <div class="footer-desc">CS2-сообщество. Играем серьёзно, растём вместе. Открытый набор для игроков уровня FaceIt 7+.</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Навигация</div>
+      <a class="footer-link" onclick="showPage('home', document.querySelectorAll('.nav-link')[0])">Главная</a>
+      <a class="footer-link" onclick="showPage('roster', document.querySelectorAll('.nav-link')[1])">Состав</a>
+      <a class="footer-link" onclick="showPage('stats', document.querySelectorAll('.nav-link')[2])">Статистика</a>
+    </div>
+    <div>
+      <div class="footer-col-title">Контакты</div>
+      <a class="footer-link">Discord: skwax.gg</a>
+      <a class="footer-link">VK: vk.com/skwaxgg</a>
+      <a class="footer-link">Steam Group</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 SKWAX COMMUNITY. Все права защищены.</div>
+    <div class="footer-copy">Powered by Counter-Strike 2</div>
+  </div>
+</footer>
+
+<script>
+  function showPage(name, linkEl) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (linkEl) linkEl.classList.add('active');
+
+    setBottomNav(name);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleDrawer() {
+    const drawer = document.getElementById('mobileDrawer');
+    const burger = document.getElementById('burger');
+    drawer.classList.toggle('open');
+    burger.classList.toggle('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('mobileDrawer').classList.remove('open');
+    document.getElementById('burger').classList.remove('open');
+  }
+
+  function setBottomNav(name) {
+    document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('bn-' + name);
+    if (el) el.classList.add('active');
+  }
+</script>
+</body>
+</html>
